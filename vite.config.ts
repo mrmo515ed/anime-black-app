@@ -54,6 +54,8 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      // Allow the Arena live-preview proxy host (and any *.e2b.app host).
+      allowedHosts: true as const,
     },
   };
 });

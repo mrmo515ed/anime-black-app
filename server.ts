@@ -1236,8 +1236,13 @@ Output ONLY a JSON object in this exact format:
   // Build APK Endpoint
   app.post("/api/apk/build", (req, res) => {
     try {
-      const scriptPath = path.join(process.cwd(), "scripts", "build_full_apk.cjs");
-      const stdout = execSync(`node "${scriptPath}"`, { encoding: "utf-8" });
+      // Real, working pipeline: aapt2 + hand-written dex + v1/v2/v3 signing
+      const scriptPath = path.join(process.cwd(), "scripts", "build_apk.cjs");
+      const stdout = execSync(`node "${scriptPath}"`, {
+        encoding: "utf-8",
+        timeout: 300000,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
       const valid = isApkValid();
 
       if (valid) {
@@ -1309,7 +1314,7 @@ Output ONLY a JSON object in this exact format:
         namespace: "android_app",
         package_name: "com.animeblack.app",
         sha256_cert_fingerprints: [
-          "14:6D:E8:FA:D0:30:3B:11:06:5D:EF:EC:17:B4:73:C0:B0:1B:5F:C1:2B:6E:9E:09:A6:6C:5F:51:7A:1B:32:89"
+          "95:DF:42:4C:16:54:A9:BB:EC:08:52:4B:E1:0D:9F:74:4B:AB:31:6B:A3:D3:FE:2D:37:DC:4D:F7:D6:05:C3:01"
         ]
       }
     }]);

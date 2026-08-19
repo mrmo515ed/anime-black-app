@@ -8,7 +8,9 @@
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "gen:dex": "node scripts/gen_dex.cjs scripts/classes.dex",
+    "build:apk": "node scripts/build_apk.cjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -19,6 +21,7 @@
     "firebase": "^12.16.0",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",
+    "qrcode": "^1.5.4",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "recharts": "^3.9.2",
@@ -28,6 +31,8 @@
     "@firebase/eslint-plugin-security-rules": "^0.0.2",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
+    "aaptjs3": "^2.0.2",
+    "apk_sign_ts": "^1.0.1",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
     "eslint": "^10.7.0",

@@ -104,7 +104,7 @@ export default function DownloadAppPage({ onClose, isArabic = true }: DownloadAp
 
     // Step 1: Check APK status or build on demand
     let currentSize = apkStatus?.size || 0;
-    let needsBuild = !apkStatus?.exists || !apkStatus?.valid || currentSize < 5 * 1024 * 1024;
+    let needsBuild = !apkStatus?.exists || !apkStatus?.valid || currentSize < 500 * 1024;
 
     if (needsBuild) {
       setBuildStep(isArabic ? "جاري تجميع حزم الموارد وأكواد الأندرويد (AAPT2)..." : "Compiling resources & Dex (AAPT2)...");

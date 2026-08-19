@@ -200,7 +200,7 @@ export default function AdministrationSystem({
   const [isBuildingApk, setIsBuildingApk] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
 
-  // Validation Logic: Checks if APK file exists in storage server and size > 5MB (5,242,880 bytes)
+  // Validation Logic: Checks if APK file exists in storage server and size > 500KB
   const validateApkInStorage = (status: typeof apkStatus): { isValid: boolean; errorMsg: string | null } => {
     if (!status) {
       return {
@@ -216,13 +216,13 @@ export default function AdministrationSystem({
           : "🚨 Error: APK file is missing in storage path. Please click 'Rebuild APK Package'."
       };
     }
-    const MIN_REQUIRED_SIZE = 5 * 1024 * 1024; // 5 MB
+    const MIN_REQUIRED_SIZE = 500 * 1024; // 500 KB
     if (status.size < MIN_REQUIRED_SIZE) {
       return {
         isValid: false,
         errorMsg: isArabic
-          ? `🚨 خطأ: ملف الـ APK تالف أو غير مكتمل (الحجم الحالي ${status.sizeFormatted} أصغر من 5MB المطلوبة). يرجى الضغط على 'إعادة البناء'.`
-          : `🚨 Error: APK file is corrupted or incomplete (Current size ${status.sizeFormatted} is less than 5MB required). Please rebuild.`
+          ? `🚨 خطأ: ملف الـ APK تالف أو غير مكتمل (الحجم الحالي ${status.sizeFormatted} أصغر من 500KB المطلوبة). يرجى الضغط على 'إعادة البناء'.`
+          : `🚨 Error: APK file is corrupted or incomplete (Current size ${status.sizeFormatted} is less than 500KB required). Please rebuild.`
       };
     }
     return { isValid: true, errorMsg: null };
@@ -268,7 +268,7 @@ export default function AdministrationSystem({
       }
     } catch {}
 
-    // 2. Validate existence and size > 5MB
+    // 2. Validate existence and size > 500KB
     const val = validateApkInStorage(currentStatus);
     if (!val.isValid) {
       setApkValidationError(val.errorMsg);
@@ -336,10 +336,10 @@ export default function AdministrationSystem({
         blob = await response.blob();
       }
 
-      if (blob.size < 5 * 1024 * 1024) {
+      if (blob.size < 500 * 1024) {
         const sizeErrMsg = isArabic
-          ? `الملف المحمل بحجم (${(blob.size / (1024 * 1024)).toFixed(2)} MB) أقل من الحد الأدنى 5MB.`
-          : `Downloaded file size is under the 5MB minimum required threshold.`;
+          ? `الملف المحمل بحجم (${(blob.size / (1024 * 1024)).toFixed(2)} MB) أقل من الحد الأدنى 500KB.`
+          : `Downloaded file size is under the 500KB minimum required threshold.`;
         setApkValidationError(sizeErrMsg);
         setDownloadProgress(null);
         playSound("error");
@@ -2714,8 +2714,8 @@ export default function AdministrationSystem({
                 </h2>
                 <p className="text-[10px] text-zinc-500">
                   {isArabic
-                    ? "التحقق التلقائي من وجود الملف في التخزين، التأكد من أن الحجم أكثر من 5MB، وإدارة التحميل المباشر."
-                    : "Automated verification of stored APK presence, enforcing >5MB minimum threshold before release."}
+                    ? "التحقق التلقائي من وجود الملف في التخزين، التأكد من أن الحجم أكثر من 500KB، وإدارة التحميل المباشر."
+                    : "Automated verification of stored APK presence, enforcing >500KB minimum threshold before release."}
                 </p>
               </div>
 
@@ -2731,13 +2731,13 @@ export default function AdministrationSystem({
                         <h3 className="text-sm font-black text-white">
                           AnimeBlack-v2.5.0-Release.apk
                         </h3>
-                        {apkStatus?.exists && apkStatus?.size >= 5 * 1024 * 1024 ? (
+                        {apkStatus?.exists && apkStatus?.size >= 500 * 1024 ? (
                           <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] font-black px-2 py-0.5 rounded-full">
                             جاهز ولائم للتنزيل (سليم)
                           </span>
                         ) : (
                           <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-black px-2 py-0.5 rounded-full">
-                            غير متوفر أو تالف (&lt; 5MB)
+                            غير متوفر أو تالف (&lt; 500KB)
                           </span>
                         )}
                       </div>
@@ -2770,7 +2770,7 @@ export default function AdministrationSystem({
                     <span className="text-[9px] text-zinc-500 font-bold block">
                       {isArabic ? "حجم الملف الحالي:" : "Current File Size:"}
                     </span>
-                    <span className={`text-xs font-black font-mono ${apkStatus && apkStatus.size >= 5 * 1024 * 1024 ? "text-emerald-400" : "text-amber-400"}`}>
+                    <span className={`text-xs font-black font-mono ${apkStatus && apkStatus.size >= 500 * 1024 ? "text-emerald-400" : "text-amber-400"}`}>
                       {apkStatus?.sizeFormatted || (isArabic ? "غير معروف" : "Unknown")}
                     </span>
                   </div>
@@ -2806,7 +2806,7 @@ export default function AdministrationSystem({
                     onClick={handleAdminApkDownload}
                     disabled={isBuildingApk || (downloadProgress !== null && downloadProgress < 100)}
                     className={`flex-1 flex items-center justify-center gap-2 font-black text-xs py-3 rounded-xl transition-all ${
-                      apkStatus?.exists && apkStatus?.size >= 5 * 1024 * 1024
+                      apkStatus?.exists && apkStatus?.size >= 500 * 1024
                         ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-950/50 cursor-pointer"
                         : "bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed opacity-80"
                     }`}
@@ -2895,7 +2895,7 @@ export default function AdministrationSystem({
                     </div>
                     <div>
                       <span className="text-zinc-500">Validation Filter: </span>
-                      <span className="text-blue-400 font-bold">Size &gt; 5MB &amp; Zip Manifest Verified</span>
+                      <span className="text-blue-400 font-bold">Size &gt; 500KB &amp; Zip Manifest Verified</span>
                     </div>
                   </div>
                 </div>

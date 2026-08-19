@@ -153,7 +153,6 @@ M(WebChromeClient, '<init>', 'V', []);
 M(M2, '<init>', 'V', [MA]);
 M(M2, 'onShowFileChooser', 'Z', [WebView, ValueCallback, FileChooserParams]);
 M(M2, 'onPermissionRequest', 'V', [PermissionRequest]);
-M(M2, 'onJsAlert', 'Z', [WebView, StringT, StringT, JsResult]);
 // ValueCallback
 M(ValueCallback, 'onReceiveValue', 'V', [ObjectT]);
 // FileChooserParams
@@ -205,7 +204,6 @@ const CLASS_DEFS = [
     virtual: [
       { method: M2 + '->onShowFileChooser(' + WebView + ValueCallback + FileChooserParams + ')Z', access: 0x0001 },
       { method: M2 + '->onPermissionRequest(' + PermissionRequest + ')V', access: 0x0001 },
-      { method: M2 + '->onJsAlert(' + WebView + StringT + StringT + JsResult + ')Z', access: 0x0001 },
     ],
   },
 ];
@@ -325,24 +323,24 @@ function defineBodies() {
     ],
   };
 
-  // p0=this p1=keyCode p2=event | v3,v4 locals
+  // p0=this p1=keyCode p2=event | v3=KEYCODE_BACK, v4=webView, v5=result
   bodies[MA + '->onKeyDown(' + 'I' + KeyEvent + ')Z'] = {
-    regs: 5, ins: 3,
+    regs: 6, ins: 3,
     code: [
       I('const/4', 3, 4),
       I('if-ne', 1, 3, 'call_super'),
-      I('iget-object', 3, 0, MA + '->webView:' + WebView),
-      I('if-eqz', 3, 'call_super'),
-      I('invoke-virtual', [3], WebView + '->canGoBack()Z'),
-      I('move-result', 4),
+      I('iget-object', 4, 0, MA + '->webView:' + WebView),
       I('if-eqz', 4, 'call_super'),
-      I('invoke-virtual', [3], WebView + '->goBack()V'),
-      I('const/4', 3, 1),
-      I('return', 3),
+      I('invoke-virtual', [4], WebView + '->canGoBack()Z'),
+      I('move-result', 5),
+      I('if-eqz', 5, 'call_super'),
+      I('invoke-virtual', [4], WebView + '->goBack()V'),
+      I('const/4', 5, 1),
+      I('return', 5),
       L('call_super'),
       I('invoke-super', [0, 1, 2], Activity + '->onKeyDown(' + 'I' + KeyEvent + ')Z'),
-      I('move-result', 3),
-      I('return', 3),
+      I('move-result', 5),
+      I('return', 5),
     ],
   };
 
@@ -361,8 +359,8 @@ function defineBodies() {
   bodies[M1 + '-><init>(' + MA + ')V'] = {
     regs: 2, ins: 2,
     code: [
-      I('iput-object', 1, 0, M1 + '->this$0:' + MA),
       I('invoke-direct', [0], WebViewClient + '-><init>()V'),
+      I('iput-object', 1, 0, M1 + '->this$0:' + MA),
       I('return-void'),
     ],
   };
@@ -378,8 +376,8 @@ function defineBodies() {
   bodies[M2 + '-><init>(' + MA + ')V'] = {
     regs: 2, ins: 2,
     code: [
-      I('iput-object', 1, 0, M2 + '->this$0:' + MA),
       I('invoke-direct', [0], WebChromeClient + '-><init>()V'),
+      I('iput-object', 1, 0, M2 + '->this$0:' + MA),
       I('return-void'),
     ],
   };
@@ -404,6 +402,7 @@ function defineBodies() {
     ],
   };
 
+  // p0=this p1=request p2=result | v2=resources (grant all requested)
   bodies[M2 + '->onPermissionRequest(' + PermissionRequest + ')V'] = {
     regs: 3, ins: 2,
     code: [
@@ -411,22 +410,6 @@ function defineBodies() {
       I('move-result-object', 2),
       I('invoke-virtual', [1, 2], PermissionRequest + '->grant(' + StringArray + ')V'),
       I('return-void'),
-    ],
-  };
-
-  // p0=this p1=view p2=url p3=message p4=result | v5=builder
-  bodies[M2 + '->onJsAlert(' + WebView + StringT + StringT + JsResult + ')Z'] = {
-    regs: 6, ins: 5,
-    code: [
-      I('new-instance', 5, AlertBuilder),
-      I('invoke-direct', [5, 1], AlertBuilder + '-><init>(' + Context + ')V'),
-      I('invoke-virtual', [5, 3], AlertBuilder + '->setMessage(' + CharSequence + ')' + AlertBuilder),
-      I('const-string', 0, 'OK'),
-      I('const/4', 1, 0),
-      I('invoke-virtual', [5, 0, 1], AlertBuilder + '->setPositiveButton(' + CharSequence + OnClickListener + ')' + AlertBuilder),
-      I('invoke-virtual', [5], AlertBuilder + '->show()' + AlertDialog),
-      I('const/4', 0, 1),
-      I('return', 0),
     ],
   };
 }
@@ -596,9 +579,193 @@ function computeOuts(code) {
 }
 
 /* ------------------------------------------------------------------ *
+ *  Bytecode verifier (type-flow analysis) — catches VerifyErrors
+ * ------------------------------------------------------------------ */
+
+function splitParams(s) {
+  const out = [];
+  let i = 0;
+  while (i < s.length) {
+    if (s[i] === 'L') {
+      const j = s.indexOf(';', i);
+      out.push(s.slice(i, j + 1));
+      i = j + 1;
+    } else if (s[i] === '[') {
+      let k = i;
+      while (s[k] === '[') k++;
+      if (s[k] === 'L') { const j = s.indexOf(';', k); out.push(s.slice(i, j + 1)); i = j + 1; }
+      else { out.push(s.slice(i, k + 1)); i = k + 1; }
+    } else {
+      out.push(s[i]);
+      i++;
+    }
+  }
+  return out;
+}
+
+function parseMethodKey(key) {
+  const arrow = key.indexOf('->');
+  const cls = key.slice(0, arrow);
+  const open = key.indexOf('(');
+  const close = key.indexOf(')');
+  const name = key.slice(arrow + 2, open);
+  const params = splitParams(key.slice(open + 1, close));
+  const ret = key.slice(close + 1);
+  return { cls, name, params, ret };
+}
+
+function paramType(desc) {
+  return desc.startsWith('L') || desc.startsWith('[') ? 'ref:' + desc : 'int';
+}
+
+function isAssignable(x, t) {
+  if (x === t) return true;
+  if (t === ObjectT) return true;
+  if (x === MA) return t === Activity || t === Context || t === ObjectT;
+  if (x === M1) return t === WebViewClient || t === ObjectT;
+  if (x === M2) return t === WebChromeClient || t === ObjectT;
+  if (x === WebView) return t === View || t === ObjectT;
+  return false;
+}
+
+function mergeReg(a, b) {
+  if (a === b) return a;
+  if (a === 'uninit') return b;
+  if (b === 'uninit') return a;
+  if (a === 'zero') return b.startsWith('ref:') ? b : a;
+  if (b === 'zero') return a.startsWith('ref:') ? a : b;
+  return 'conflict';
+}
+
+function verifyBodies() {
+  const errors = [];
+  for (const key of Object.keys(bodies)) {
+    const body = bodies[key];
+    const { cls, params, ret } = parseMethodKey(key);
+    const regs = new Array(body.regs).fill('uninit');
+    regs[0] = 'ref:' + cls;
+    for (let i = 0; i < params.length; i++) regs[1 + i] = paramType(params[i]);
+
+    const pending = new Map(); // label -> array of snapshots
+    let lastInvokeRet = 'int';
+
+    const snapshot = () => regs.slice();
+    const fail = (msg) => errors.push(key + ' :: ' + msg);
+
+    for (const insn of body.code) {
+      if (insn.label) {
+        const snapshots = pending.get(insn.label) || [];
+        let merged = regs.slice();
+        for (const snap of snapshots) {
+          for (let r = 0; r < merged.length; r++) merged[r] = mergeReg(merged[r], snap[r]);
+        }
+        for (let r = 0; r < merged.length; r++) regs[r] = merged[r];
+        continue;
+      }
+      const a = insn.args;
+      const checkRef = (r, expected) => {
+        const t = regs[r];
+        if (t === 'zero') return;
+        if (t === 'conflict') { fail('register v' + r + ' has conflicting types'); return; }
+        if (t === 'uninit') { fail('register v' + r + ' read before assignment'); return; }
+        if (t.startsWith('ref:')) {
+          if (!isAssignable(t.slice(4), expected)) fail('register v' + r + ' type ' + t + ' not assignable to ' + expected);
+          return;
+        }
+        fail('register v' + r + ' type ' + t + ' used where ' + expected + ' expected');
+      };
+      const checkInt = (r) => {
+        const t = regs[r];
+        if (t === 'int' || t === 'zero') return;
+        fail('register v' + r + ' type ' + t + ' used where int expected');
+      };
+      // if-eqz / if-nez accept both int and references (null check)
+      const checkNullable = (r) => {
+        const t = regs[r];
+        if (t === 'int' || t === 'zero' || (t && t.startsWith('ref:'))) return;
+        fail('register v' + r + ' type ' + t + ' used where int/reference expected');
+      };
+
+      switch (insn.op) {
+        case 'return-void': break;
+        case 'return': checkInt(a[0]); break;
+        case 'move-result': regs[a[0]] = 'int'; break;
+        case 'move-result-object': regs[a[0]] = lastInvokeRet; break;
+        case 'const/4': regs[a[0]] = a[1] === 0 ? 'zero' : 'int'; break;
+        case 'const/16': regs[a[0]] = 'int'; break;
+        case 'const-string': regs[a[0]] = 'ref:' + StringT; break;
+        case 'new-instance': regs[a[0]] = 'ref:' + a[1]; break;
+        case 'new-array': checkInt(a[1]); regs[a[0]] = 'ref:' + a[2]; break;
+        case 'if-eq': case 'if-ne': checkInt(a[0]); checkInt(a[1]); pending.set(a[2], [...(pending.get(a[2]) || []), snapshot()]); break;
+        case 'if-eqz': case 'if-nez': checkNullable(a[0]); pending.set(a[1], [...(pending.get(a[1]) || []), snapshot()]); break;
+        case 'iget-object': {
+          const f = FIELDS[fieldIndex.get(a[2])];
+          checkRef(a[1], f.cls);
+          regs[a[0]] = 'ref:' + f.type;
+          break;
+        }
+        case 'iput-object': {
+          const f = FIELDS[fieldIndex.get(a[2])];
+          checkRef(a[1], f.cls);
+          const t = regs[a[0]];
+          if (t === 'zero') break;
+          if (t === 'conflict') { fail('iput-object value register has conflicting types'); break; }
+          if (t && t.startsWith('ref:') && !isAssignable(t.slice(4), f.type)) fail('iput-object value ' + t + ' not assignable to field ' + f.type);
+          else if (t && !t.startsWith('ref:')) fail('iput-object value register ' + t + ' not a reference');
+          break;
+        }
+        case 'aput-object': {
+          const arrT = regs[a[1]];
+          if (arrT === 'conflict') fail('aput-object array register has conflicting types');
+          else if (arrT && arrT.startsWith('ref:[')) {
+            const comp = arrT.slice(5); // component type
+            const t = regs[a[0]];
+            if (t === 'zero') break;
+            if (t === 'conflict') { fail('aput-object value has conflicting types'); break; }
+            if (t && t.startsWith('ref:')) {
+              // strip array brackets from component for assignability
+              if (t.slice(4) !== comp) fail('aput-object value ' + t + ' not assignable to ' + comp);
+            } else fail('aput-object value ' + t + ' not a reference');
+          } else fail('aput-object target register ' + arrT + ' not an array');
+          checkInt(a[2]);
+          break;
+        }
+        case 'invoke-virtual':
+        case 'invoke-super':
+        case 'invoke-direct':
+        case 'invoke-static':
+        case 'invoke-interface': {
+          const regs2 = a[0];
+          const mk = parseMethodKey(a[1]);
+          const isStatic = insn.op === 'invoke-static';
+          let idx = 0;
+          if (!isStatic) {
+            checkRef(regs2[idx], mk.cls);
+            idx = 1;
+          }
+          for (const p of mk.params) {
+            if (p === 'I' || p === 'Z' || p === 'B' || p === 'S' || p === 'C') checkInt(regs2[idx]);
+            else checkRef(regs2[idx], p);
+            idx++;
+          }
+          lastInvokeRet = mk.ret === 'V' ? 'int' : (mk.ret.startsWith('L') || mk.ret.startsWith('[') ? 'ref:' + mk.ret : 'int');
+          break;
+        }
+        default: break;
+      }
+    }
+  }
+  if (errors.length) {
+    throw new Error('DEX verification failed:\n - ' + errors.join('\n - '));
+  }
+}
+
+/* ------------------------------------------------------------------ *
  *  Build the DEX file
  * ------------------------------------------------------------------ */
 function buildDex() {
+  verifyBodies();
+
   const headerSize = 0x70;
 
   // --- string data ---

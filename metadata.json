@@ -1,0 +1,7 @@
+{
+  "name": "Anime Black",
+  "description": "منصة التواصل الاجتماعي الفاخرة لعشاق الأنمي والمانجا المجهزة بأدوات ومساعد ذكي مدعوم بـ Gemini",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_NATIVE_ANDROID_IAPPYX","MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

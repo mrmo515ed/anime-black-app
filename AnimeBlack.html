@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Anime Black | أنمي بلاك</title>
+  
+  <style>
+    /* Reset & Mobile Polish */
+    *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;margin:0;padding:0;}
+    *:focus{outline:none;}
+    button{-webkit-appearance:none;background:none;border:none;color:inherit;font:inherit;cursor:pointer;}
+    input,textarea,select{-webkit-appearance:none;font:inherit;}
+    body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text;}
+    
+    :root {
+      --bg: #0d0d1a;
+      --surface: #1a1a2e;
+      --surface-elevated: #24243e;
+      --border: #282845;
+      --accent: #0f3460;
+      --accent-glow: #e94560;
+      --text: #eaeaea;
+      --text-secondary: rgba(255,255,255,0.6);
+      --text-muted: rgba(255,255,255,0.4);
+      --highlight: #4FC3F7;
+      --success: #69F0AE;
+      --error: #FF6B6B;
+      --card-radius: 14px;
+      --pill-radius: 50px;
+    }
+
+    [data-theme="amoled"] {
+      --bg: #000000;
+      --surface: #0a0a10;
+      --surface-elevated: #141420;
+      --border: #1f1f30;
+      --accent: #e94560;
+    }
+
+    [data-theme="light"] {
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --surface-elevated: #e9edf5;
+      --border: #d0d7e5;
+      --accent: #2b5876;
+      --text: #1a1a2e;
+      --text-secondary: #555566;
+      --text-muted: #888899;
+      --highlight: #0288d1;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #app-container {
+      width: 100%;
+      max-width: 600px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      position: relative;
+      padding-bottom: 74px;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(26, 26, 46, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      height: 56px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .brand-logo span {
+      background: linear-gradient(135deg, #e94560, #4FC3F7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--pill-radius);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 1px solid var(--border);
+      transition: transform 0.1s ease;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    .badge-dot {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 8px;
+      height: 8px;
+      background: var(--accent-glow);
+      border-radius: 50%;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 600px;
+      height: 64px;
+      background: rgba(26, 26, 46, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+      padding: 0 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      flex: 1;
+      padding: 6px 0;
+      transition: all 0.15s ease;
+    }
+
+    .nav-item.active {
+      color: var(--highlight);
+    }
+
+    .nav-item.active svg {
+      stroke: var(--highlight);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--text-muted);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* Add Center Action Button */
+    .nav-add-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e94560, #0f3460);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+      margin-top: -16px;
+      border: 2px solid var(--bg);
+    }
+
+    /* Content Area */
+    .view-content {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Stories Bar */
+    .stories-container {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 4px 0 10px 0;
+      scrollbar-width: none;
+    }
+    .stories-container::-webkit-scrollbar { display: none; }
+
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 68px;
+      flex-shrink: 0;
+    }
+
+    .story-ring {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      padding: 2px;
+      background: linear-gradient(45deg, #e94560, #4FC3F7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .story-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      object-fit: cover;
+      background: #333;
+    }
+
+    .story-name {
+      font-size: 11px;
+      color: var(--text-secondary);
+      max-width: 64px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    /* Card Standard */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+    }
+
+    .user-meta h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .user-meta p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .time-badge {
+      font-size: 11px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,0.05);
+      padding: 4px 8px;
+      border-radius: var(--pill-radius);
+      border: 1px solid var(--border);
+    }
+
+    .post-content {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .post-media {
+      width: 100%;
+      border-radius: 10px;
+      max-height: 360px;
+      object-fit: cover;
+      background: #111;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 6px;
+      border-radius: 8px;
+    }
+
+    .action-btn.active-like {
+      color: var(--accent-glow);
+    }
+
+    /* Anime Universe Grid */
+    .anime-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .anime-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .anime-cover {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .anime-details {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .anime-title {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .anime-score {
+      font-size: 11px;
+      color: var(--highlight);
+      font-weight: bold;
+    }
+
+    /* Modal / Bottom Sheet */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 600px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #e94560, #0f3460);
+      color: #fff;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: var(--pill-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(233,69,96,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+    
+    <!-- Top Header -->
+    <header class="top-nav">
+      <div class="brand-logo">
+        <span>⚡ Anime Black</span>
+      </div>
+      <div class="nav-actions">
+        <button class="icon-btn" onclick="openSearchModal()" title="بحث">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <button class="icon-btn" onclick="openNotificationsModal()" title="الإشعارات">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <div class="badge-dot"></div>
+        </button>
+        <button class="icon-btn" onclick="switchTab('profile')" title="حسابي">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop" class="avatar" style="width: 28px; height: 28px;">
+        </button>
+      </div>
+    </header>
+
+    <!-- Main View Content -->
+    <main id="main-view" class="view-content">
+      
+      <!-- Stories Bar -->
+      <section class="stories-container">
+        <div class="story-item" onclick="createStory()">
+          <div class="story-ring" style="background: var(--surface-elevated);">
+            <div class="story-avatar" style="display: flex; align-items: center; justify-content: center; background: var(--surface);">
+              <span style="font-size: 20px; font-weight: bold; color: var(--highlight);">+</span>
+            </div>
+          </div>
+          <span class="story-name">قصتي</span>
+        </div>
+        
+        <div class="story-item" onclick="viewStory('Luffy')">
+          <div class="story-ring">
+            <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=100&h=100&fit=crop" class="story-avatar">
+          </div>
+          <span class="story-name">لوفي</span>
+        </div>
+
+        <div class="story-item" onclick="viewStory('Zoro')">
+          <div class="story-ring">
+            <img src="https://images.unsplash.com/photo-1563089145-599997674d42?w=100&h=100&fit=crop" class="story-avatar">
+          </div>
+          <span class="story-name">زورو</span>
+        </div>
+
+        <div class="story-item" onclick="viewStory('Goku')">
+          <div class="story-ring">
+            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=100&h=100&fit=crop" class="story-avatar">
+          </div>
+          <span class="story-name">غوكو</span>
+        </div>
+      </section>
+
+      <!-- Feed Container -->
+      <section id="feed-posts" style="display: flex; flex-direction: column; gap: 14px;">
+        
+        <!-- Post 1 -->
+        <article class="card">
+          <div class="card-header">
+            <div class="user-info">
+              <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=100&h=100&fit=crop" class="avatar">
+              <div class="user-meta">
+                <h4>ملك القراصنة ⚡</h4>
+                <p>@luffy_king</p>
+              </div>
+            </div>
+            <div class="time-badge">منذ 15 دقيقة</div>
+          </div>
+
+          <p class="post-content">حلقة اليوم من ون بيس كانت أسطورية بكل المقاييس! التحريك والموسيقى التصويرية في مستوى سينمائي بحت 🔥 ما رأيكم في القتال الأخير؟</p>
+          <img src="https://images.unsplash.com/photo-1563089145-599997674d42?w=600&h=350&fit=crop" class="post-media">
+
+          <div class="card-actions">
+            <div class="action-group">
+              <button class="action-btn" onclick="toggleLike(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                <span>342</span>
+              </button>
+              <button class="action-btn" onclick="openComments('1')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                <span>48</span>
+              </button>
+            </div>
+            <div class="action-group">
+              <button class="action-btn" onclick="sharePost('ون بيس حلقة اليوم الأسطورية!')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchTab('home')">
+        <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>الرئيسية</span>
+      </button>
+
+      <button class="nav-item" onclick="switchTab('universe')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+        <span>الكون</span>
+      </button>
+
+      <button class="nav-add-btn" onclick="openComposerModal()" title="نشر جديد">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+
+      <button class="nav-item" onclick="switchTab('chat')">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>الدردشة</span>
+      </button>
+
+      <button class="nav-item" onclick="switchTab('profile')">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>جوازي</span>
+      </button>
+    </nav>
+
+    <!-- Modals & Sheets -->
+    <div id="composer-modal" class="modal-overlay" onclick="if(event.target===this)closeComposerModal()">
+      <div class="modal-sheet">
+        <h3 style="font-size: 16px; font-weight: bold;">إنشاء منشور أنمي جديد ✍️</h3>
+        <textarea id="composer-input" rows="4" placeholder="ما الذي يدور في ذهنك اليوم عن الأنمي والمانغا؟" style="width: 100%; background: var(--surface-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; resize: none;"></textarea>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <button class="icon-btn" onclick="pickPostImage()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          </button>
+          <button class="btn-primary" onclick="publishPost()">نشر الآن</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- iappyxOS 6-Core Modules Execution Order -->
+  <script src="01_iappyx_init.js"></script>
+  <script src="02_iappyx_storage.js"></script>
+  <script src="03_iappyx_network.js"></script>
+  <script src="04_iappyx_native.js"></script>
+  <script src="05_iappyx_fallback.js"></script>
+
+  <!-- Main UI Event & Navigation Handlers -->
+  <script>
+    function switchTab(tabName) {
+      if (window.NativeBridge && window.NativeBridge.vibrate) {
+        window.NativeBridge.vibrate.tick();
+      }
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const activeEl = event.currentTarget;
+      if (activeEl && activeEl.classList.contains('nav-item')) {
+        activeEl.classList.add('active');
+      }
+
+      if (tabName === 'universe') {
+        renderUniverseView();
+      } else if (tabName === 'chat') {
+        renderChatView();
+      } else if (tabName === 'profile') {
+        renderProfileView();
+      } else {
+        location.reload();
+      }
+    }
+
+    function renderUniverseView() {
+      const container = document.getElementById('main-view');
+      container.innerHTML = `
+        <h2 style="font-size: 18px; font-weight: 800;">🌌 كون الأنمي والمانغا</h2>
+        <div class="anime-grid">
+          <div class="anime-card">
+            <img src="https://images.unsplash.com/photo-1563089145-599997674d42?w=300&h=200&fit=crop" class="anime-cover">
+            <div class="anime-details">
+              <span class="anime-title">One Piece</span>
+              <span class="anime-score">★ 9.2/10</span>
+            </div>
+          </div>
+          <div class="anime-card">
+            <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300&h=200&fit=crop" class="anime-cover">
+            <div class="anime-details">
+              <span class="anime-title">Attack on Titan</span>
+              <span class="anime-score">★ 9.5/10</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderChatView() {
+      const container = document.getElementById('main-view');
+      container.innerHTML = `
+        <h2 style="font-size: 18px; font-weight: 800;">💬 المحادثات والمجتمعات</h2>
+        <div class="card" onclick="openChatRoom('مملكة الأوتاكو')">
+          <div class="card-header">
+            <div class="user-info">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop" class="avatar">
+              <div class="user-meta">
+                <h4>مملكة الأوتاكو (عام)</h4>
+                <p>زورو: متى ينزل الفصل الجديد؟</p>
+              </div>
+            </div>
+            <span class="time-badge">الآن</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProfileView() {
+      const container = document.getElementById('main-view');
+      container.innerHTML = `
+        <div class="card" style="text-align: center; align-items: center;">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop" class="avatar" style="width: 80px; height: 80px; border: 2px solid var(--highlight);">
+          <h3 style="font-size: 18px; font-weight: 800; margin-top: 8px;">أوتاكو أسطوري ⚡</h3>
+          <p style="font-size: 12px; color: var(--text-secondary);">المستوى 42 • رتبة الهاكي الملكي</p>
+          <div style="width: 100%; background: var(--surface-elevated); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px;">
+            <div style="width: 75%; height: 100%; background: linear-gradient(90deg, #e94560, #4FC3F7);"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleLike(btn) {
+      if (window.NativeBridge && window.NativeBridge.vibrate) {
+        window.NativeBridge.vibrate.click();
+      }
+      btn.classList.toggle('active-like');
+    }
+
+    function openComposerModal() {
+      document.getElementById('composer-modal').style.display = 'flex';
+    }
+
+    function closeComposerModal() {
+      document.getElementById('composer-modal').style.display = 'none';
+    }
+
+    function publishPost() {
+      const txt = document.getElementById('composer-input').value;
+      if (!txt.trim()) return;
+      if (window.FallbackSystem) {
+        window.FallbackSystem.showToast('تم نشر المنشور بنجاح في أنمي بلاك! 🎉', 'success');
+      }
+      closeComposerModal();
+      document.getElementById('composer-input').value = '';
+    }
+
+    function sharePost(title) {
+      if (window.NativeBridge && window.NativeBridge.share) {
+        window.NativeBridge.share.shareText(title + ' - عبر تطبيق أنمي بلاك https://animeblack.app');
+      }
+    }
+
+    function pickPostImage() {
+      if (window.NativeBridge && window.NativeBridge.media) {
+        window.NativeBridge.media.pickImage().then(res => {
+          if (window.FallbackSystem) window.FallbackSystem.showToast('تم اختيار الصورة!', 'info');
+        }).catch(() => {});
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+sed -i '/} as any);/i \            if (ud.homeSections) setSections(ud.homeSections);\n            if (ud.homeWidgets) setWidgets(ud.homeWidgets);\n            if (ud.homeCardSize) setCardSize(ud.homeCardSize);\n            if (ud.homeViewType) setViewType(ud.homeViewType);' src/App.tsx

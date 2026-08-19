@@ -1,0 +1,1 @@
+sed -i '/<\/body>/i \    <script>\n      function _initBridge(){\n        if(typeof iappyx==="undefined"){\n          setTimeout(_initBridge,50);\n          return;\n        }\n        window.isIappyxApp = true;\n      }\n      window.addEventListener("load",function(){setTimeout(_initBridge,200)});\n    </script>' index.html

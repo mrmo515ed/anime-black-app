@@ -1,0 +1,143 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile data",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "username": { "type": "string", "maxLength": 100, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "avatar": { "type": "string" },
+        "isVerified": { "type": "boolean" },
+        "tasteProfile": {
+          "type": "object",
+          "description": "Adaptive genre weights adding up to 100%"
+        },
+        "discoveryLogs": {
+          "type": "array",
+          "description": "History of recent discovery interactions logged for AI adaptation"
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "username"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "A social media post",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string", "maxLength": 128 },
+        "content": { "type": "string", "maxLength": 2000 },
+        "image": { "type": "string" },
+        "video": { "type": "string" },
+        "likes": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorId", "content", "createdAt"]
+    },
+    "Story": {
+      "title": "Story",
+      "description": "A short-lived story",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string", "maxLength": 128 },
+        "mediaType": { "type": "string", "enum": ["image", "video"] },
+        "url": { "type": "string" },
+        "views": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorId", "mediaType", "url", "createdAt"]
+    },
+    "Reel": {
+      "title": "Reel",
+      "description": "A short video",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "videoUrl": { "type": "string" },
+        "authorId": { "type": "string", "maxLength": 128 },
+        "likes": { "type": "number" },
+        "commentsCount": { "type": "number" },
+        "shares": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "videoUrl", "authorId", "createdAt"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "A chat room or conversation",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "avatar": { "type": "string" },
+        "type": { "type": "string", "enum": ["group", "ai", "channel", "direct"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "memberIds": {
+          "type": "array",
+          "items": { "type": "string", "maxLength": 128 },
+          "maxItems": 100
+        }
+      },
+      "required": ["name", "type", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notification",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["like", "comment", "follow", "mention"] },
+        "text": { "type": "string", "maxLength": 500 },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "type", "text", "read", "createdAt"]
+    },
+    "Reaction": {
+      "title": "Reaction",
+      "description": "Universal Reaction on any element",
+      "type": "object",
+      "properties": {
+        "reactionType": { "type": "string" },
+        "userId": { "type": "string", "maxLength": 128 },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "targetType": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reactionType", "userId", "targetId", "targetType", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user profiles"
+    },
+    "/posts/{postId}": {
+      "schema": { "$ref": "#/entities/Post" },
+      "description": "Stores posts"
+    },
+    "/stories/{storyId}": {
+      "schema": { "$ref": "#/entities/Story" },
+      "description": "Stores stories"
+    },
+    "/reels/{reelId}": {
+      "schema": { "$ref": "#/entities/Reel" },
+      "description": "Stores reels"
+    },
+    "/chats/{chatId}": {
+      "schema": { "$ref": "#/entities/Chat" },
+      "description": "Stores chats"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "Stores notifications"
+    },
+    "/reactions/{reactionId}": {
+      "schema": { "$ref": "#/entities/Reaction" },
+      "description": "Stores universal reactions"
+    }
+  }
+}

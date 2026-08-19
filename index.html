@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ar" dir="rtl" class="h-full bg-[#0A0A0A] select-none">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Anime Black | أنمي بلاك</title>
+    <!-- Web App & Android APK Manifest Meta Tags -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#FF3D00" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="AnimeBlack" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <!-- Beautiful Cairo and Inter Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+      * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+      *:focus { outline: none; }
+      button { -webkit-appearance: none; background: none; border: none; color: inherit; font: inherit; cursor: pointer; }
+      input, textarea, select { -webkit-appearance: none; font: inherit; }
+      body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+      input, textarea, [contenteditable] { -webkit-user-select: text; user-select: text; }
+      /* Smooth custom scrollbars for webkit */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0A0A0A;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #2A2A2A;
+        border-radius: 999px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #FF3D00;
+      }
+      
+      /* Disable default pull-to-refresh on mobile */
+      body {
+        overscroll-behavior-y: contain;
+        background-color: #0A0A0A;
+        color: #E0E0E0;
+        font-family: 'Cairo', 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body class="h-full overflow-hidden">
+    <div id="root" class="h-full"></div>
+    <script src="/01_iappyx_init.js"></script>
+    <script src="/02_iappyx_storage.js"></script>
+    <script src="/03_iappyx_network.js"></script>
+    <script src="/04_iappyx_native.js"></script>
+    <script src="/05_iappyx_fallback.js"></script>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      function _initBridge(){
+        if(typeof iappyx==="undefined"){
+          setTimeout(_initBridge,50);
+          return;
+        }
+        window.isIappyxApp = true;
+        var originalSetItem = Storage.prototype.setItem;
+        var originalGetItem = Storage.prototype.getItem;
+        var originalRemoveItem = Storage.prototype.removeItem;
+        Storage.prototype.setItem = function(key, value) {
+          iappyx.save(key, String(value));
+          return originalSetItem.call(this, key, value);
+        };
+        Storage.prototype.getItem = function(key) {
+          var val = iappyx.load(key);
+          if (val) return val;
+          return originalGetItem.call(this, key);
+        };
+        Storage.prototype.removeItem = function(key) {
+          iappyx.remove(key);
+          return originalRemoveItem.call(this, key);
+        };
+      }
+      window.addEventListener("load",function(){setTimeout(_initBridge,200)});
+    </script>
+  </body>
+</html>
+

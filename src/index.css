@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ==========================================================
+   ANIME BLACK SIGNATURE BUTTON PALETTE & VIBRANT GRADIENTS
+   ========================================================== */
+
+/* Primary Crimson Flame Gradient Button */
+.btn-anime-primary {
+  background: linear-gradient(135deg, #FF7A00 0%, #FF3D00 50%, #E60000 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 4px 16px rgba(255, 61, 0, 0.35);
+  font-weight: 800;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-anime-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 20px rgba(255, 61, 0, 0.5);
+  transform: translateY(-1px);
+}
+.btn-anime-primary:active {
+  transform: scale(0.97);
+}
+
+/* Secondary Dark Surface Anime Button */
+.btn-anime-secondary {
+  background: #14141E;
+  color: #E4E4E7;
+  border: 1px solid #272732;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+.btn-anime-secondary:hover {
+  background: #1C1C28;
+  border-color: rgba(255, 122, 0, 0.4);
+  color: #FFFFFF;
+}
+
+/* Cyber Neon Cyan Button */
+.btn-anime-cyan {
+  background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(103, 232, 249, 0.35);
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+  font-weight: 800;
+}
+.btn-anime-cyan:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 18px rgba(6, 182, 212, 0.45);
+}
+
+/* Shonen Gold / Amber Button */
+.btn-anime-gold {
+  background: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(253, 230, 138, 0.4);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+  font-weight: 800;
+}
+.btn-anime-gold:hover {
+  filter: brightness(1.1);
+}
+
+/* Astral Purple Button */
+.btn-anime-purple {
+  background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(216, 180, 254, 0.35);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.3);
+  font-weight: 800;
+}
+.btn-anime-purple:hover {
+  filter: brightness(1.1);
+}
+
+/* Emerald Vitality Button */
+.btn-anime-emerald {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(167, 243, 208, 0.35);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  font-weight: 800;
+}
+.btn-anime-emerald:hover {
+  filter: brightness(1.1);
+}
+
+/* Dark Glassmorphism Pill */
+.btn-anime-glass {
+  background: rgba(22, 22, 30, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #E4E4E7;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+.btn-anime-glass:hover {
+  border-color: rgba(255, 122, 0, 0.5);
+  color: #FFFFFF;
+}
+
+/* Global Button Tap suppression and smoothness */
+button {
+  -webkit-tap-highlight-color: transparent;
+}
